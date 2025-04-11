@@ -1,72 +1,74 @@
 #include <iostream>
-using namespace  std;
+using namespace std;
 
-class process{
+class Process {
 public:
     string PName;
-    int BT;
-    int WT;
-    int AT;
-    int TAT;
-    int RT;
-    int CT;
+    int BT;  // Burst Time
+    int WT;  // Waiting Time
+    int AT;  // Arrival Time
+    int TAT; // Turn Around Time
+    int RT;  // Response Time
+    int CT;  // Completion Time
 };
 
-int main(){
+int main() {
+    int numProcess;
+    cout << "Enter the number of processes: ";
+    cin >> numProcess;
 
-int numProcess;
-cout<<"enter the number of processes";
-cin>>numProcess;
-process p[numProcess];
-for(int x=0;x<numProcess;x++){
-cout<<"enter name of process for "<<x+1<<endl;
-cin>>p[x].PName;
-cout<<"enter the Arrival time for "<<x+1<<endl;
-cin>>p[x].AT;
-cout<<"enter the Burst time for "<<x+1<<endl;
-cin>>p[x].BT;
+    Process p[numProcess];
 
-}
-for(int i=0;i<numProcess-1;i++){
-        for(int j=i+1;j<numProcess;j++){
-            if(p[j].AT < p[i].AT){
-                process temp = p[j];
+    for (int x = 0; x < numProcess; x++) {
+        cout << "Enter name of process " << x + 1 << ": ";
+        cin >> p[x].PName;
+        cout << "Enter Arrival Time for " << p[x].PName << ": ";
+        cin >> p[x].AT;
+        cout << "Enter Burst Time for " << p[x].PName << ": ";
+        cin >> p[x].BT;
+    }
+
+    // Sort processes based on Arrival Time
+    for (int i = 0; i < numProcess - 1; i++) {
+        for (int j = i + 1; j < numProcess; j++) {
+            if (p[j].AT < p[i].AT) {
+                Process temp = p[j];
                 p[j] = p[i];
                 p[i] = temp;
             }
         }
     }
-    int sumRT = 0;
-    int sumCT = 0;
-    int sumWT = 0;
-    int sumTAT = 0;
 
+    int currentTime = 0;
+    int sumRT = 0, sumCT = 0, sumWT = 0, sumTAT = 0;
 
-    int cumulativeSum = 0;
-for(int x=0;x<numProcess;x++){
-        p[x].WT = cumulativeSum;
-        p[x].CT=p[x].AT+p[x].BT;
-        if(x == 0){
-            p[x].RT = 0;
-        }
-        else{
-            p[x].RT = p[x-1].CT;
-        }
-        p[x].TAT=p[x].CT-p[x].AT;
+    for (int x = 0; x < numProcess; x++) {
+        if (currentTime < p[x].AT)
+            currentTime = p[x].AT;
 
- cout << "\nProcess " << p[x].PName << ":\n";
+        p[x].RT = currentTime - p[x].AT;
+        p[x].WT = currentTime - p[x].AT;
+        p[x].CT = currentTime + p[x].BT;
+        p[x].TAT = p[x].CT - p[x].AT;
+
+        currentTime = p[x].CT;
+
+        // Print process details
+        cout << "\nProcess " << p[x].PName << ":\n";
         cout << "Response Time: " << p[x].RT << endl;
         cout << "Completion Time: " << p[x].CT << endl;
         cout << "Waiting Time: " << p[x].WT << endl;
         cout << "Turn Around Time: " << p[x].TAT << endl;
 
-
         sumRT += p[x].RT;
         sumCT += p[x].CT;
         sumWT += p[x].WT;
         sumTAT += p[x].TAT;
+    }
 
-        cumulativeSum += p[x].BT;
+    cout << "\nAverage Response Time: " << (float)sumRT / numProcess;
+    cout << "\nAverage Waiting Time: " << (float)sumWT / numProcess;
+    cout << "\nAverage Turn Around Time: " << (float)sumTAT / numProcess << endl;
 
-}
+    return 0;
 }
